@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-# $Id: crawler.pl,v 1.0.0-0 2009/09/04 17:03:39 Cnangel Exp $
+# $Id: crawler.pl,v 1.0.0-0 2009/09/16 20:57:53 Cnangel Exp $
 
 use strict;
 use warnings;
@@ -29,14 +29,69 @@ pod2usage(1) if $help;
 pod2usage(-exitstatus => 0, -verbose => 2) if $man;
 $ARGV{conf} = "$Bin/../conf/config.cfg" unless ($ARGV && -f $ARGV{conf});
 pod2usage() unless (-f $ARGV{conf});
-
 # use vars qw/@files/;
+
+my %DBMode = (
+		BerkeleyDB	=> \&getContentAndExtract_BerkeleyDB,
+		MySQL		=> \&getContentAndExtract_MySQL,
+		);
+
 
 # read config file
 my $conf = Conf::Libconfig->new;
 $conf->read_file($ARGV{'conf'});
-my $host = $conf->lookup_value("application.host");
-die 'host is null' unless ($host);
+my $queryfile = $conf->lookup_value("application.container_1.queryfile");
+my $dbtype = $conf->lookup_value("application.container_1.dbtype");
+die 'queryfile not exists!' unless ($queryfile);
+
+if ($DBMode{$dbtype}) {
+	$DBMode{$dbtype}->($queryfile);
+} else {
+	print "fail\n";
+}
+#    $env = new BerkeleyDB::Env
+#	             -Home         => "/home/databases"
+
+sub getContentAndExtract_BerkeleyDB
+{
+	my $file = shift;
+	$Mode{$action}->();
+    $env = new BerkeleyDB::Env
+		             -Home         => "/home/databases"
+
+}
+
+sub getContentAndExtract_MySQL
+{
+	print "MySQL\n";
+}
+
+__END__
+open my $fp, '<', $queryfile or die "Can't read the file: $!";
+while (my $line = <$fp>)
+{
+	$line =~ s/^\s*//;
+	$line =~ s/\s*$//;
+	next unless ($line);
+	&getContentAndExtract($line);
+}
+close($fp);
+
+sub getContentAndExtract
+{
+	my $str = shift;
+}
+
+
+
+
+
+
+
+
+
+
+
 
 # sub GetFileFromDir
 # {
@@ -179,14 +234,14 @@ sub posturlinfo
 {
     eval("use Socket;");
     return if ($@ ne "");
-    ($host,$path,$content) = @_;
+    my ($host, $path, $content) = @_;
     $host =~ s/^http:\/\///isg;
-    $port = 80;
+    my $port ||= 80;
     $path = "/$path" if ($path !~ /^\//);
     my ($name, $aliases, $type, $len, @thataddr, $a, $b, $c, $d, $that);
-    my ($name, $aliases, $type, $len, @thataddr) = gethostbyname($host);
-    my ($a, $b, $c, $d) = unpack("C4", $thataddr[0]);
-    my $that = pack('S n C4 x8', 2, $port, $a, $b, $c, $d);
+    ($name, $aliases, $type, $len, @thataddr) = gethostbyname($host);
+    ($a, $b, $c, $d) = unpack("C4", $thataddr[0]);
+    $that = pack('S n C4 x8', 2, $port, $a, $b, $c, $d);
     return unless (socket(S, 2, 1, 0));
     select(S);
     $| = 1;
@@ -198,7 +253,7 @@ sub posturlinfo
     print S "Content-length: $contentLength\n";
     print S "\n";
     print S "$content";
-    @results = <S>;
+    my @results = <S>;
     close(S);
     undef $|;
     return;
@@ -278,6 +333,6 @@ B<Cnangel> (I<junliang.li@alibaba-inc.com>)
 
 =head1 HISTORY
 
-I<2009/09/04 17:03:39> Builded.
+I<2009/09/16 20:57:53> Builded.
 
 =cut
