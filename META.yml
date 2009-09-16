@@ -1,0 +1,23 @@
+---
+abstract: 'The great new Crawler::BDZD!'
+author:
+  - 'Cnangel <junliang.li@alibaba-inc.com>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.91'
+license: bsd
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Crawler-BDZD
+no_index:
+  directory:
+    - inc
+    - t
+resources:
+  license: http://opensource.org/licenses/bsd-license.php
+version: 0.01
