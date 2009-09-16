@@ -7,3 +7,4 @@ BEGIN {
 }
 
 diag( "Testing Crawler::BDZD $Crawler::BDZD::VERSION, Perl $], $^X" );
+
