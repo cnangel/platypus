@@ -7,6 +7,7 @@ all_from 'lib/Crawler/BDZD.pm';
 author   q{Cnangel <junliang.li@alibaba-inc.com>};
 license  'bsd';
 
+requires 'Digest::MD5' => 2.35;
 build_requires 'Test::More';
 
 auto_install;
