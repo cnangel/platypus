@@ -140,13 +140,16 @@ REQUIREDETAIL:
 				$zhidaoquestion = $1;
 			}
 			my ($zhidaoanswer) = $detailcacheinfo =~ /div[^>]+?best_answer_content"?>\s*(.*?)\s*<\/div>\s*<div[^>]+best_answer_info/s;
-			if ($zhidaoanswer =~ m/<pre>(.*?)<\/pre>/s)
+			if ($zhidaoanswer && $zhidaoanswer =~ m/<pre>(.*?)<\/pre>/s)
 			{
 				$zhidaoanswer = $1;
 			}
-			$zhidaotitle =~ s/"/""/g;
-			$zhidaoquestion =~ s/"/""/g;
-			$zhidaoanswer =~ s/"/""/g;
+			$zhidaotitle =~ s/"/""/g if ($zhidaotitle);
+			$zhidaoquestion =~ s/"/""/g if ($zhidaoquestion);
+			$zhidaoanswer =~ s/"/""/g if ($zhidaoanswer);
+			$zhidaotitle = "" unless ($zhidaotitle);
+			$zhidaoquestion = "" unless ($zhidaoquestion);
+			$zhidaoanswer = "" unless ($zhidaoanswer);
 			print $op qq/"$pagetype","$$queryref","$zhidaotitle","$zhidaoquestion","$zhidaoanswer"\n/;
 		}
 		else
