@@ -11,7 +11,10 @@ requires 'Digest::MD5' => 2.35;
 requires 'Encode' => 2.12;
 build_requires 'Test::More';
 
-install_script 'bin/crawler.pl' 'bin/test.pl'
+no_index( directory => qw< t inc conf data bin > );
+
+install_script ('bin/crawler.pl');
+install_script ('bin/test.pl');
 auto_install;
 
 WriteAll;
