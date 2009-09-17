@@ -117,10 +117,15 @@ sub geturlinfo
     print S "GET $path HTTP/$http_protocol_version\r\n";
     print S "Host: $host\r\n";
     print S "Accept: */*\r\n";
-    print S "User-Agent: Mozilla/5.0 (compatible; MSIE 6.00; Windows NT 5.2)\r\n";
+#    print S "User-Agent: Mozilla/5.0 (compatible; MSIE 6.00; Windows NT 5.2)\r\n";
+	print S "User-Agent: Mozilla/5.0 (X11; U; Linux i686; zh-CN; rv:1.9.1.3) Gecko/20090909 Fedora/3.5.3-1.fc11 Firefox/3.5.3\r\n";
+#	print S "Accept-Encoding: gzip,deflate\r\n";
     print S "Pragma: no-cache\r\n";
     print S "Cache-Control: no-cache\r\n";
+#	print S "Keep-Alive: 300\r\n";
+#	print S "Connection: keep-alive\r\n";
     print S "Connection: close\r\n";
+	print S "Referer: http://zhidao.baidu.com/q?word=%CA%D6%BB%FA&ct=17&pn=0&tn=ikaslist&rn=10&lm=0&fr=search\r\n";
     print S "\r\n";
 
     my @results = <S>;
@@ -128,6 +133,48 @@ sub geturlinfo
 #    undef $|;
 	my $content = join("", @results);
     return \$content;
+}
+
+=head1 FUNCTIONS
+
+=head2 $self->gethtml($url)
+
+Get page infomation through HTTP protocol with LWP tool.
+
+=cut
+
+sub gethtml
+{
+	my ($self, $url) = @_;
+	use LWP::UserAgent;
+	my $ua = LWP::UserAgent->new;
+#	$ua->agent("MyApp/0.1 ");
+	$ua->agent("Mozilla/5.0 (Windows; U; Windows NT 5.1; zh-CN; rv:1.9.0.10) Gecko/2009042316 Firefox/3.0.10");
+
+	# Create a request
+#	my $req = HTTP::Request->new(POST => 'http://search.cpan.org/search');
+#	$req->content_type('application/x-www-form-urlencoded');
+#	$req->content('query=libwww-perl&mode=dist');
+
+	# Pass request to the user agent and get a response back
+#	my $res = $ua->request($req);
+
+	$ua->timeout(30);
+	$ua->env_proxy;
+ 
+	my $res = $ua->get($url);
+	my $infos;
+
+	# Check the outcome of the response
+	if ($res->is_success)
+	{
+		$infos = $res->content;
+	}
+	else
+	{
+		$infos = $res->status_line;
+	}
+	return \$infos;
 }
 
 =head1 FUNCTIONS

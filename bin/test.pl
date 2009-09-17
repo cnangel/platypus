@@ -94,12 +94,12 @@ REQUIREDETAIL:
 	if ($@ && -e $file)
 	{
 		unlink($file);
-		&getcontent($url, $file, 'detailcacheinfo');
+		&getcontent($url, $file, 'detailcacheinfo', '', 2);
 		goto REQUIREDETAIL;
 	}
 	elsif (!-e $file) 
 	{
-		&getcontent($url, $file, 'detailcacheinfo');
+		&getcontent($url, $file, 'detailcacheinfo', '', 2);
 		goto REQUIREDETAIL;
 	}
 	unless ($detailcacheinfo)
@@ -108,12 +108,11 @@ REQUIREDETAIL:
 		warn "You can see $file\n";
 		return 1;
 	}
-	if ($detailcacheinfo !~ /HTTP\/1\.\d 200 OK/)
+	if ($detailcacheinfo !~ /HTTP\/1\.\d 200 OK/ && $detailcacheinfo !~ /<\!\-\-STATUS OK\-\->/)
 	{
 		warn "Content of detail page: $url is not right!!\n";
 		warn "You can see $file\n";
 		return 1;
-		#unlink($file);
 	}
 	if ($pagetype)
 	{
@@ -145,7 +144,6 @@ REQUIREDETAIL:
 			{
 				$zhidaoanswer = $1;
 			}
-#			print $op "$pagetype\t" . $cc->base64encode($zhidaotitle) . "\t" . $cc->base64encode($zhidaoquestion) . "\t" . $cc->base64encode($zhidaoanswer) . "\n";
 			$zhidaotitle =~ s/"/""/g;
 			$zhidaoquestion =~ s/"/""/g;
 			$zhidaoanswer =~ s/"/""/g;
@@ -161,9 +159,12 @@ REQUIREDETAIL:
 
 sub getcontent
 {
-	my ($url, $file, $varname, $hpv) = @_;
+	my ($url, $file, $varname, $hpv, $getflag) = @_;
+	$varname = "cacheinfo" unless ($varname);
+	$getflag ||= 1;
 	return 0 if (-e $file && -M $file <= 0.5);
-	my $content = $cc->geturlinfo($url, '', $hpv);
+	my $content = $getflag == 1 ? $cc->geturlinfo($url, '', $hpv) :
+		$cc->gethtml($url);
 	$$content =~ s/\~/\\\~/g;
 	open CACHE, ">$file" or die "Can't write the cache file:$!";
 	print CACHE '$'.$varname.' = qq~' . $$content . '~;1;';
