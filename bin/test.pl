@@ -94,12 +94,12 @@ REQUIREDETAIL:
 	if ($@ && -e $file)
 	{
 		unlink($file);
-		&getcontent($url, $file, 'detailcacheinfo', '', 1);
+		&getcontent($url, $file, 'detailcacheinfo', '', 2);
 		goto REQUIREDETAIL;
 	}
 	elsif (!-e $file) 
 	{
-		&getcontent($url, $file, 'detailcacheinfo', '', 1);
+		&getcontent($url, $file, 'detailcacheinfo', '', 2);
 		goto REQUIREDETAIL;
 	}
 	unless ($detailcacheinfo)
