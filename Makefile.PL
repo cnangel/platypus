@@ -8,8 +8,10 @@ author   q{Cnangel <junliang.li@alibaba-inc.com>};
 license  'bsd';
 
 requires 'Digest::MD5' => 2.35;
+requires 'Encode' => 2.12;
 build_requires 'Test::More';
 
+#install_scripts 
 auto_install;
 
 WriteAll;

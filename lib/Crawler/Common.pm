@@ -34,18 +34,180 @@ if you don't export anything, such as for a purely object-oriented module.
 
 =head1 FUNCTIONS
 
-=head2 function1
+=head2 $self->new()
+
+Construct.
 
 =cut
 
-sub function1 {
+sub new
+{
+	my $class = shift;
+	my $self = {};
+	bless $self, $class;
+	return $self;
 }
 
-=head2 function2
+=head1 FUNCTIONS
+
+=head2 $self->checkdir()
+
+Check directory whether exist, if not exists, create it.
 
 =cut
 
-sub function2 {
+sub checkdir($$)
+{
+	my $self = shift;
+	my $dirpath = shift;
+	return 1 if (-d $dirpath);
+	mkdir($dirpath, 0777);
+	chmod(0777, $dirpath);
+	return 0;
+}
+
+=head1 FUNCTIONS
+
+=head2 $self->geturlinfo($url, [$proxy], [$http_protocol_version])
+
+Get page infomation through HTTP protocol.
+default HTTP protocol version is 1.1.
+
+=cut
+
+sub geturlinfo
+{
+    my ($self, $url, $proxy, $http_protocol_version) = @_;
+    eval("use Socket;");
+
+	$proxy = "" unless ($proxy);
+	$http_protocol_version = "1.1" unless ($http_protocol_version);
+    my ($host, $port, $path);
+    if ($proxy ne '' && $proxy ne 'direct')
+    {
+            ($host, $port) = split(/:/, $proxy);
+            $port ||= 80;
+            $path = $url;
+            $path = "http://$path" if ($path !~ /^http:\/\//i);
+    }
+    else
+    {
+            $url =~ s/^http:\/\///isg;
+            ($host, undef) = split(/\//, $url);
+            $path = $url;
+            $path =~ s/^$host//iso;
+            ($host, $port) = split(/:/, $host);
+            $port ||= 80;
+            $path = "/$path" if ($path !~ /^\//);
+    }
+
+    my ($name, $aliases, $type, $len, @thataddr, $a, $b, $c, $d, $that);
+
+    ($name, $aliases, $type, $len, @thataddr) = gethostbyname($host);
+    ($a, $b, $c, $d) = unpack("C4", $thataddr[0]);
+    $that = pack('S n C4 x8', 2, $port, $a, $b, $c, $d);
+
+    return "" unless (socket(S, 2, 1, 0));
+    select(S);
+    $| = 1;
+    select(STDOUT);
+    return "" unless (connect(S, $that));
+
+#    print S "GET $path HTTP/1.0\r\n";
+    print S "GET $path HTTP/$http_protocol_version\r\n";
+    print S "Host: $host\r\n";
+    print S "Accept: */*\r\n";
+    print S "User-Agent: Mozilla/5.0 (compatible; MSIE 6.00; Windows NT 5.2)\r\n";
+    print S "Pragma: no-cache\r\n";
+    print S "Cache-Control: no-cache\r\n";
+    print S "Connection: close\r\n";
+    print S "\r\n";
+
+    my @results = <S>;
+    close(S);
+#    undef $|;
+	my $content = join("", @results);
+    return \$content;
+}
+
+=head1 FUNCTIONS
+
+=head2 $self->urlencode($str)
+
+Str encode.
+
+=cut
+
+sub urlencode
+{
+	my ($self, $str) = @_;
+	return $str if ($str =~ /\%/);
+	return unless (defined($str));
+	$str =~ s/([^;\/?:@&=+\$,A-Za-z0-9\-_.!~*'()])/uc sprintf('%%%02x', ord($1))/eg;
+	$str =~ tr/ /+/;
+	return $str;
+}
+
+=head1 FUNCTIONS
+
+=head2 $self->urldecode($str)
+
+Str decode.
+
+=cut
+
+sub urldecode
+{
+	my ($self, $str) = @_;
+	return $str if ($str =~ /\%/);
+	return if !defined $str;
+	$str =~ s/([^@\w\.\*\-\x20\:\/])/uc sprintf('%%%02x',ord($1))/eg;
+	$str =~ tr/ /+/;
+	return $str;
+}
+
+=head1 FUNCTIONS
+
+=head2 $self->base64encode($str)
+
+Str base64encode.
+
+=cut
+
+sub base64encode
+{
+	my $self = shift;
+	my $res = pack("u", $_[0]);
+	$res =~ s/^.//mg;
+	$res =~ s/\n//g;
+	$res =~ tr|` -_|AA-Za-z0-9+/|;
+	my $padding = (3 - length($_[0]) % 3) % 3;
+	$res =~ s/.{$padding}$/'=' x $padding/e if $padding;
+	return $res;
+}
+
+=head1 FUNCTIONS
+
+=head2 $self->base64decode($str)
+
+Str base64decode.
+
+=cut
+
+sub base64decode
+{
+	local($^W) = 0;
+	my ($self, $str) = @_;
+	my $res = '';
+
+	$str =~ tr|A-Za-z0-9+/||cd;
+	$str =~ tr|A-Za-z0-9+/| -_|;
+	while ($str =~ /(.{1,60})/gs)
+	{
+		my $len = chr(32 + length($1)*3/4);
+		$res .= unpack("u", $len . $1 );
+	}
+	return $res;
 }
 
 =head1 AUTHOR
