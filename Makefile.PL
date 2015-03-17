@@ -4,7 +4,7 @@ use inc::Module::Install;
 
 name     'Crawler-BDZD';
 all_from 'lib/Crawler/BDZD.pm';
-author   q{Cnangel <junliang.li@alibaba-inc.com>};
+author   q{Cnangel <cnangel@gmail.com>};
 license  'bsd';
 
 requires 'Digest::MD5' => 2.35;

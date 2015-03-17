@@ -261,7 +261,7 @@ sub base64decode
 
 =head1 AUTHOR
 
-Cnangel, C<< <junliang.li at alibaba-inc.com> >>
+Cnangel, C<< <cnangel at gmail.com> >>
 
 =head1 BUGS
 

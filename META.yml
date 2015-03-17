@@ -1,7 +1,7 @@
 ---
 abstract: 'The great new Crawler::BDZD!'
 author:
-  - 'Cnangel <junliang.li@alibaba-inc.com>'
+  - 'Cnangel <cnangel@gmail.com>'
 build_requires:
   ExtUtils::MakeMaker: 6.42
   Test::More: 0
